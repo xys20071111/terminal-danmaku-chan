@@ -1,4 +1,4 @@
-namespace BLiveListenTool
+namespace TerminalDanmakuChan
 {
     public class Config
     {

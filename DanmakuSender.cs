@@ -1,32 +1,5 @@
-namespace BLiveListenTool
+namespace TerminalDanmakuChan
 {
-    class Danmaku
-    {
-        public long color;
-        public long bubble;
-        public string msg;
-        public long mode;
-        public long fontsize;
-        public long rnd;
-        public long roomid;
-        public string csrf;
-        public string csrf_token;
-
-        public static Danmaku CreateDanmaku(long roomId, string csrf, string text)
-        {
-            Danmaku danmaku = new Danmaku();
-            danmaku.csrf = csrf;
-            danmaku.csrf_token = csrf;
-            danmaku.roomid = roomId;
-            danmaku.rnd = new Random().NextInt64(35244353, 54534636);
-            danmaku.fontsize = 24;
-            danmaku.mode = 1;
-            danmaku.bubble = 1;
-            danmaku.color = 5816798;
-            danmaku.msg = text;
-            return danmaku;
-        }
-    }
     public class DanmakuSender
     {
         private readonly string csrf, buvid3, sessdata;

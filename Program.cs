@@ -1,6 +1,6 @@
 ﻿using Terminal.Gui;
 using Newtonsoft.Json;
-namespace BLiveListenTool
+namespace TerminalDanmakuChan
 {
     public class Program
     {
@@ -53,7 +53,8 @@ namespace BLiveListenTool
                 Width = Dim.Percent(90),
                 Height = Dim.Fill()
             };
-            Button sendDanmaku = new Button("发送",true){
+            Button sendDanmaku = new Button("发送", true)
+            {
                 Height = Dim.Fill(),
                 Width = Dim.Percent(10),
                 X = Pos.Right(danmakuInput)
@@ -76,7 +77,34 @@ namespace BLiveListenTool
             {
                 danmakuList.Add($"{uname}: {text}");
                 danmakuListView.SelectedItem = danmakuList.Count - 1;
-                if(danmakuList.Count > 16)
+                if (danmakuList.Count > 16)
+                {
+                    danmakuListView.ScrollDown(1);
+                }
+            };
+            danmakuReceiver.OnGift += (string uname, string name, int count, int price) =>
+            {
+                danmakuList.Add($"{uname}投喂了{count}个{name}, 共{price}元");
+                danmakuListView.SelectedItem = danmakuList.Count - 1;
+                if (danmakuList.Count > 16)
+                {
+                    danmakuListView.ScrollDown(1);
+                }
+            };
+            danmakuReceiver.OnSuperChat += (string uname, string text, string price) =>
+            {
+                danmakuList.Add($"醒目留言 {price}元 {uname}: {text}");
+                danmakuListView.SelectedItem = danmakuList.Count - 1;
+                if (danmakuList.Count > 16)
+                {
+                    danmakuListView.ScrollDown(1);
+                }
+            };
+            danmakuReceiver.OnGuard += (string name, string type) =>
+            {
+                danmakuList.Add($"{name}开通了{type}");
+                danmakuListView.SelectedItem = danmakuList.Count - 1;
+                if (danmakuList.Count > 16)
                 {
                     danmakuListView.ScrollDown(1);
                 }
@@ -86,7 +114,8 @@ namespace BLiveListenTool
             danmakuReceiver.Connect();
             Thread receiveThread = new Thread(danmakuReceiver.ReceiveData);
             receiveThread.Start();
-            Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(100), (MainLoop caller) => {
+            Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(100), (MainLoop caller) =>
+            {
                 danmakuListView.Visible = false;
                 danmakuListView.Visible = true;
                 return true;

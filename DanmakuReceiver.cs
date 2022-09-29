@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.IO.Compression;
 using System.Text;
 
-namespace BLiveListenTool
+namespace TerminalDanmakuChan
 {
     public class DanmakuReceiver
     {
@@ -11,10 +11,12 @@ namespace BLiveListenTool
         public delegate void DanmakuCallback(string uname, string text);
         public delegate void GiftCallback(string uname, string name, int count, int price);
         public delegate void SuperchatCallback(string uname, string text, string price);
+        public delegate void GuardCallback(string name, string type);
         public event ConnectCallback Connected;
         public event DanmakuCallback OnDanmaku;
         public event GiftCallback OnGift;
         public event SuperchatCallback OnSuperChat;
+        public event GuardCallback OnGuard;
         private readonly ClientWebSocket client = new ClientWebSocket();
         private readonly HttpClient httpClient = new HttpClient();
         private readonly long roomId;
@@ -140,7 +142,7 @@ namespace BLiveListenTool
                                                 {
                                                     leftQuoteCount--;
                                                     msgJsonFinal += item.ToString();
-                                                    if(leftQuoteCount == 0)
+                                                    if (leftQuoteCount == 0)
                                                     {
                                                         break;
                                                     }
@@ -161,6 +163,23 @@ namespace BLiveListenTool
                                                 case "DANMU_MSG":
                                                     {
                                                         OnDanmaku($"{msgObject["info"][2][1]}", $"{msgObject["info"][1]}");
+                                                        break;
+                                                    }
+                                                case "SEND_GIFT":
+                                                    {
+                                                        JObject data = (JObject)msgObject.GetValue("data");
+                                                        OnGift($"{data["uname"]}", $"{data["giftName"]}", data["super_gift_num"].ToObject<int>(), data["price"].ToObject<int>() / 1000 * msgObject["data"]["super_gift_num"].ToObject<int>());
+                                                        break;
+                                                    }
+                                                case "SUPER_CHAT_MESSAGE":
+                                                    {
+                                                        // TODO: 抓个SC的包看看
+                                                        break;
+                                                    }
+                                                case "GUARD_BUY":
+                                                    {
+                                                        JObject data = (JObject)msgObject.GetValue("data");
+                                                        OnGuard(data["username"].ToString(), data["gift_name"].ToString());
                                                         break;
                                                     }
                                             }
