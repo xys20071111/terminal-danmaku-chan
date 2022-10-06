@@ -99,7 +99,7 @@ namespace TerminalDanmakuChan
                 }
                 if (client.State == WebSocketState.Open)
                 {
-                    byte[] buf = new byte[8192];
+                    byte[] buf = new byte[16777216];
                     ArraySegment<byte> buffer = new ArraySegment<byte>(buf);
                     int totalLength = client.ReceiveAsync(buffer, CancellationToken.None).Result.Count;
                     byte[] protocolBuffer = new ArraySegment<byte>(buf, 6, 2).ToArray();
@@ -121,7 +121,7 @@ namespace TerminalDanmakuChan
                             {
                                 if (protocol == 3)
                                 {
-                                    byte[] msgBuffer = new byte[4096];
+                                    byte[] msgBuffer = new byte[16777216];
                                     BrotliDecoder.TryDecompress(payload, msgBuffer, out int payloadTotalLength);
                                     int offset = 0;
                                     while (offset < payloadTotalLength)
@@ -129,9 +129,13 @@ namespace TerminalDanmakuChan
                                         byte[] lengthBuffer = new ArraySegment<byte>(msgBuffer, offset, 4).ToArray();
                                         Array.Reverse(lengthBuffer);
                                         uint length = BitConverter.ToUInt32(lengthBuffer);
-                                        ArraySegment<byte> singalPayloadBuffer = new ArraySegment<byte>(msgBuffer, offset + 16, Convert.ToInt32(length));
                                         try
                                         {
+                                            if (offset + 16 + length > msgBuffer.Length)
+                                            {
+                                                throw new Exception("弹幕信息buffer太小了");
+                                            }
+                                            ArraySegment<byte> singalPayloadBuffer = new ArraySegment<byte>(msgBuffer, offset + 16, Convert.ToInt32(length));
                                             int leftQuoteCount = 0;
                                             string msgJson = Encoding.UTF8.GetString(singalPayloadBuffer);
                                             string msgJsonFinal = "";
