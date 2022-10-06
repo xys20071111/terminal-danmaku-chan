@@ -112,7 +112,10 @@ namespace TerminalDanmakuChan
             top.Add(mainWindow);
             top.Add(menuBar);
             danmakuReceiver.Connect();
-            Thread receiveThread = new Thread(danmakuReceiver.ReceiveData);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            Thread receiveThread = new Thread(() => {
+                danmakuReceiver.ReceiveData(cancellationTokenSource.Token);
+            });
             receiveThread.Start();
             Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(100), (MainLoop caller) =>
             {
@@ -121,7 +124,7 @@ namespace TerminalDanmakuChan
                 return true;
             });
             Application.Run();
-            danmakuReceiver.isStoped = true;
+            cancellationTokenSource.Cancel();
             Application.Shutdown();
         }
         static bool Quit()

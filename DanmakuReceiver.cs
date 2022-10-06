@@ -22,7 +22,6 @@ namespace TerminalDanmakuChan
         private readonly long roomId;
         private readonly string token, serverUrl;
         private readonly System.Timers.Timer timer = new System.Timers.Timer();
-        public bool isStoped = false;
         public DanmakuReceiver(long roomId)
         {
             this.roomId = roomId;
@@ -90,11 +89,11 @@ namespace TerminalDanmakuChan
             Buffer.BlockCopy(payload, 0, packet, 16, payload.Length);
             return packet;
         }
-        public void ReceiveData()
+        public void ReceiveData(CancellationToken cancellationToken)
         {
             while (true)
             {
-                if (isStoped)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     break;
                 }
