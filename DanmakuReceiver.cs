@@ -42,6 +42,7 @@ namespace TerminalDanmakuChan
                     Connect();
                 }
             };
+            timer.Interval = 20000;
         }
         public void Connect()
         {
@@ -72,7 +73,7 @@ namespace TerminalDanmakuChan
             byte[] packet = new byte[totalLength];
 
             byte[] totalLengthBuffer = BitConverter.GetBytes(totalLength);
-            byte[] headerLengthBuffer = BitConverter.GetBytes((short)16);
+            byte[] headerLengthBuffer = BitConverter.GetBytes(Convert.ToInt16(16));
             byte[] protocolBuffer = BitConverter.GetBytes(protocol);
             byte[] typeBuffer = BitConverter.GetBytes(type);
             byte[] placeholderBuffer = BitConverter.GetBytes((uint)1);
