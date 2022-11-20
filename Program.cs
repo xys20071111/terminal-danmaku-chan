@@ -25,7 +25,7 @@ namespace TerminalDanmakuChan
                 Width = Dim.Fill(),
                 Height = Dim.Percent(5)
             };
-            FrameView mainWindow = new FrameView($"黑听工具 房间{(args.Length > 1 ? long.Parse(args[1]) : config.roomId)}")
+            FrameView mainWindow = new FrameView($"终端弹幕酱 房间{(args.Length > 1 ? long.Parse(args[1]) : config.roomId)}")
             {
                 Width = Dim.Fill(),
                 Height = Dim.Percent(95),
