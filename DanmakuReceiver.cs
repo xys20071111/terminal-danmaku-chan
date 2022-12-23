@@ -25,10 +25,10 @@ namespace TerminalDanmakuChan
         public DanmakuReceiver(long roomId)
         {
             this.roomId = roomId;
-            var res = httpClient.GetAsync($"https://api.live.bilibili.com/room/v1/Danmu/getConf?room_id={roomId}&platform=pc&player=web").Result;
+            var res = httpClient.GetAsync($"https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id={roomId}&type=0").Result;
             JObject resJson = JObject.Parse(res.Content.ReadAsStringAsync().Result);
             token = resJson["data"]["token"].ToString();
-            serverUrl = $"wss://{resJson["data"]["host_server_list"][0]["host"]}:{resJson["data"]["host_server_list"][0]["wss_port"]}/sub";
+            serverUrl = $"wss://{resJson["data"]["host_list"][0]["host"]}:{resJson["data"]["host_list"][0]["wss_port"]}/sub";
             timer.AutoReset = true;
             timer.Elapsed += (object _sender, System.Timers.ElapsedEventArgs _args) =>
             {
