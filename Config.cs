@@ -6,6 +6,6 @@ namespace TerminalDanmakuChan
         public string buvid3;
         public string sessdata;
         public long uid;
-        public long roomId;
+        public int roomId;
     }
 }

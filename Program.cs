@@ -8,7 +8,7 @@ namespace TerminalDanmakuChan
         {
             List<String> danmakuList = new List<string>();
             Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(args[0]));
-            DanmakuReceiver danmakuReceiver = new DanmakuReceiver(args.Length > 1 ? long.Parse(args[1]) : config.roomId);
+            DanmakuReceiver danmakuReceiver = new DanmakuReceiver(args.Length > 1 ? int.Parse(args[1]) : config.roomId);
             DanmakuSender danmakuSender = new DanmakuSender(config.csrf, config.buvid3, config.sessdata, args.Length > 1 ? long.Parse(args[1]) : config.roomId);
             Application.Init();
             Toplevel top = Application.Top;
@@ -69,11 +69,11 @@ namespace TerminalDanmakuChan
                 danmakuSender.Send(danmakuInput.Text.ToString());
                 danmakuInput.Text = "";
             };
-            danmakuReceiver.Connected += () =>
+            danmakuReceiver.OnConnect += () =>
             {
                 danmakuList.Add("已连接到服务器");
             };
-            danmakuReceiver.OnDanmaku += (string uname, string text) =>
+            danmakuReceiver.OnDanmaku += (string uname, string text, long _) =>
             {
                 danmakuList.Add($"{uname}: {text}");
                 danmakuListView.SelectedItem = danmakuList.Count - 1;
@@ -82,7 +82,7 @@ namespace TerminalDanmakuChan
                     danmakuListView.ScrollDown(1);
                 }
             };
-            danmakuReceiver.OnGift += (string uname, string name, int count, int price) =>
+            danmakuReceiver.OnGift += (string uname, string name, int count, float price) =>
             {
                 danmakuList.Add($"{uname}投喂了{count}个{name}, 共{price}元");
                 danmakuListView.SelectedItem = danmakuList.Count - 1;
@@ -91,15 +91,15 @@ namespace TerminalDanmakuChan
                     danmakuListView.ScrollDown(1);
                 }
             };
-            danmakuReceiver.OnSuperChat += (string uname, string text, string price) =>
-            {
-                danmakuList.Add($"醒目留言 {price}元 {uname}: {text}");
-                danmakuListView.SelectedItem = danmakuList.Count - 1;
-                if (danmakuList.Count > 16)
-                {
-                    danmakuListView.ScrollDown(1);
-                }
-            };
+            // danmakuReceiver.OnSuperChat += (string uname, string text, string price) =>
+            // {
+            //     danmakuList.Add($"醒目留言 {price}元 {uname}: {text}");
+            //     danmakuListView.SelectedItem = danmakuList.Count - 1;
+            //     if (danmakuList.Count > 16)
+            //     {
+            //         danmakuListView.ScrollDown(1);
+            //     }
+            // };
             danmakuReceiver.OnGuard += (string name, string type) =>
             {
                 danmakuList.Add($"{name}开通了{type}");
@@ -109,12 +109,25 @@ namespace TerminalDanmakuChan
                     danmakuListView.ScrollDown(1);
                 }
             };
+            danmakuReceiver.OnDisconnect += (int type) => {
+                if (type != 0)
+                {
+                    danmakuReceiver.Connect();
+                }
+            };
             top.Add(mainWindow);
             top.Add(menuBar);
             danmakuReceiver.Connect();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread receiveThread = new Thread(() => {
-                danmakuReceiver.ReceiveData(cancellationTokenSource.Token);
+                while(true)
+                {
+                    if(cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    danmakuReceiver.Receive();
+                }
             });
             receiveThread.Start();
             Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(100), (MainLoop caller) =>
