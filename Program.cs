@@ -91,15 +91,15 @@ namespace TerminalDanmakuChan
                     danmakuListView.ScrollDown(1);
                 }
             };
-            // danmakuReceiver.OnSuperChat += (string uname, string text, string price) =>
-            // {
-            //     danmakuList.Add($"醒目留言 {price}元 {uname}: {text}");
-            //     danmakuListView.SelectedItem = danmakuList.Count - 1;
-            //     if (danmakuList.Count > 16)
-            //     {
-            //         danmakuListView.ScrollDown(1);
-            //     }
-            // };
+            danmakuReceiver.OnSuperChat += (string uname, float price, string text) =>
+            {
+                danmakuList.Add($"醒目留言 {uname}: {text}");
+                danmakuListView.SelectedItem = danmakuList.Count - 1;
+                if (danmakuList.Count > 16)
+                {
+                    danmakuListView.ScrollDown(1);
+                }
+            };
             danmakuReceiver.OnGuard += (string name, string type) =>
             {
                 danmakuList.Add($"{name}开通了{type}");

@@ -166,7 +166,7 @@ namespace TerminalDanmakuChan
                         JObject data = (JObject)msgObject.GetValue("data");
                         if(OnSuperChat != null)
                         {
-                            OnSuperChat($"{data["user_info"]["uname"]}", data["price"].ToObject<int>(), $"{data["message"]}");
+                            OnSuperChat($"{data["user_info"]["uname"]}", data["price"].ToObject<float>(), $"{data["message"]}");
                         }
                         break;
                     }
